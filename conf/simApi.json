@@ -1,0 +1,27 @@
+{
+  // This is a comment
+  "cmds" : {
+     "show version": 
+      { 
+        "result" : { "1" : 1 } 
+      },
+
+    /* This is
+       another 
+       comment. */
+
+    "show interfaces status": // Yet another comment
+      { 
+        "delay" : 0,
+        "result" : { "2" : 2 } 
+      }
+  },
+
+  "regexes" : {
+     "show man (.*)": 
+      { 
+        "delay" : 3,
+        "result" : { "term" : "$1" } 
+      }
+  }
+}
