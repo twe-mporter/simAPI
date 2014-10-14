@@ -1,0 +1,56 @@
+[FORMAT]
+
+indent-string='    '
+
+[BASIC]
+method-rgx=[a-z_][a-z0-9_]{2,50}$
+
+[MESSAGES CONTROL]
+# Used when an except catches Exception instances.
+disable=W0703
+
+# Too many return statements
+# Too many branches
+disable=R0911, R0912
+
+# No exception type specified
+disable=W0702
+
+# Disable statistics by type
+disable=RP0101
+
+# Allow local disables
+# Missing docstring
+# Abstract class not referenced
+# Similar lines in 2 files
+disable=I0011,C0111,R0921,R0801
+
+[REPORTS]
+# Include message's id in output
+include-ids=yes
+
+# Tells wether to display a full report or only the messages
+reports=no
+
+[DESIGN]
+
+# Maximum number of return / yield for function / method body
+max-returns=20
+
+# Maximum number of branch for function / method body
+max-branches=30
+
+# Maximum number of statements in function / method body
+max-statements=100
+
+# Maximum number of arguments for function / method
+max-args=10
+
+# Minimum number of public methods for a class (see R0903).
+min-public-methods=0
+
+# Maximum number of public methods for a class (see R0904).
+max-public-methods=600
+
+# Maximum number of attributes for a class (see R0902).
+max-attributes=20

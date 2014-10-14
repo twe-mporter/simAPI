@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# Copyright (c) 2014 Arista Networks, Inc.  All rights reserved.
+# Arista Networks, Inc. Confidential and Proprietary.
+
+# pylint: disable=C0103
+# pylint: disable=F0401
+
 import re
 import cjson
 import jsonrpclib
@@ -9,6 +16,7 @@ import CapiConstants
 import CapiRequestContext
 import Tracing
 
+
 traceHandle = Tracing.Handle('SimApi')
 trace = traceHandle.trace3
 
@@ -17,13 +25,13 @@ SIM_API_CONFIG_FILE = '/persist/sys/simApi.json'
 
 # Regular expression for comments
 COMMENT_RE = re.compile(
-    '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
+    r'(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
     re.DOTALL | re.MULTILINE
 )
 
 def load_config():
-    with open(SIM_API_CONFIG_FILE) as f:
-        content = ''.join(f.readlines())
+    with open(SIM_API_CONFIG_FILE) as config:
+        content = ''.join(config.readlines())
 
         match = COMMENT_RE.search(content)
         while match:
@@ -49,6 +57,7 @@ def processCommand(cmd, config):
                     return {}
 
                 for index, group in enumerate(match.groups()):
+                    # pylint: disable=W0123
                     result = eval(str(result).replace('$%d' % (index + 1),
                                                       group))
                 try:
@@ -81,17 +90,17 @@ def processCommand(cmd, config):
 
 class SimApiApplication(object):
     def __init__(self):
-        self.aaaManager = CapiAaa.AaaManager('ar')
+        self.aaa_manager = CapiAaa.AaaManager('ar')
         self.server = jsonrpclib.Server(EAPI_SOCKET)
 
     def __call__(self, request, start_response):
-        (reposeCode, contentType,
+        (code, content_type,
          headers, body) = self.processRequest(request)
         headers = headers if headers else []
-        headers.append(('Content-type', contentType))
+        headers.append(('Content-type', content_type))
         if body:
             headers.append(('Content-length', str(len(body))))
-            start_response(reposeCode,
+            start_response(code,
                            CapiConstants.ServerConstants.DEFAULT_HEADERS +
                            headers)
         return [body]
@@ -104,43 +113,42 @@ class SimApiApplication(object):
 
             with CapiRequestContext.RequestContext(
                     request,
-                    self.aaaManager) as request:
-                requestObject = cjson.decode(request.getRequestContent())
-                assert requestObject['method'] == 'runCmds', \
+                    self.aaa_manager) as request:
+                request = cjson.decode(request.getRequestContent())
+                assert request['method'] == 'runCmds', \
                     'Only runCmds is mocked'
-                cmdResult = []
-                print requestObject
-                for cmd in requestObject['params'][1]:
+                result = []
+                for cmd in request['params'][1]:
                     result = processCommand(cmd, config)
                     if result is not None:
-                        cmdResult.append(result)
+                        result.append(result)
                     else:
-                        reqFormat = 'json'
-                        if len(requestObject['params']) == 3:
-                            reqFormat = requestObject['params'][2]
+                        req_format = 'json'
+                        if len(request['params']) == 3:
+                            req_format = request['params'][2]
                         try:
-                           normalOutput = self.server.runCmds(
-                              1, [cmd], reqFormat)
-                        except jsonrpclib.ProtocolError as e:
-                           print('processRequest protocol error', result)
-                           result = cjson.encode({'jsonrpc': '2.0',
-                                                  'error': { 'code': e.message[0],
-                                                             'message': e.message[1] },
-                                                  'id': requestObject['id']})
-                           return ('1002 invalid command', 'application/json', 
-                                   None, result)
-                        cmdResult.append(normalOutput[0])
+                            output = self.server.runCmds(
+                                1, [cmd], req_format)
+                        except jsonrpclib.ProtocolError as exc:
+                            result = cjson.encode({
+                                'jsonrpc': '2.0',
+                               'error': {'code': exc.message[0],
+                                         'message': exc.message[1]},
+                               'id': request['id']})
+                            return ('1002 invalid command', 'application/json',
+                                    None, result)
+                        result.append(output[0])
                 result = cjson.encode({'jsonrpc': '2.0',
-                                        'result': cmdResult,
-                                        'id': requestObject['id']})
-                print('processRequest exit', result)
+                                        'result': result,
+                                        'id': request['id']})
                 return ('200 OK', 'application/json', None, result)
-        except CapiRequestContext.HttpException as e:
-            trace('processRequest HttpException', e)
-            return ('%s %s' % (e.code, e.name), e.contentType,
-                    e.additionalHeaders,
-                    e.message)
-        except Exception as e:
-            print('processRequest Exception', e)
+        except CapiRequestContext.HttpException as exc:
+            trace('processRequest HttpException', exc)
+            return ('%s %s' % (exc.code, exc.name), exc.content_type,
+                    exc.additionalHeaders,
+                    exc.message)
+        except Exception as exc:
+            trace('processRequest Exception', exc)
             traceback.print_exc()
-            return ('500 Internal Server Error', 'text/html', None, e.message)
+            return ('500 Internal Server Error', 'text/html', None,
+                    exc.message)

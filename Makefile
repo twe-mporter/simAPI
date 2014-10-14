@@ -10,7 +10,6 @@
 #   make rpm  ------ produce RPMs
 #   make sdist ----- builds a source distribution
 #   make tests ----- run the tests
-#   make coverage -- run the tests and analyze code coverage
 #
 ########################################################
 # variable section
@@ -34,7 +33,7 @@ RPMNVR = "$(NAME)-$(VERSION)-$(RPMRELEASE)"
 all: clean python
 
 pylint:
-	find . -name \*.py | xargs pylint --rcfile .pylintrc
+	find . -name \*.py | xargs pylint --rcfile .pylintrc  --msg-template '{path}:{line}: [{msg_id}] {msg}'
 
 clean:
 	@echo "---------------------------------------------"
@@ -51,22 +50,13 @@ clean:
 	@echo "Cleaning up byte compiled python stuff"
 	@echo "---------------------------------------------"
 	find . -type f -regex ".*\.py[co]$$" -delete
+	@echo "---------------------------------------------"
+	@echo "Removing simApi.egg-info"
+	@echo "---------------------------------------------"
+	rm -rf simApi.egg-info
 
 tests: clean
 	$(PYTHON) -m unittest discover ./test -v
-
-coverage: clean
-	PYTHONPATH=. nosetests --verbosity=3 -x --with-xunit \
-			   --xunit-file=junit-report.xml  \
-			   --with-coverage --cover-erase --cover-html \
-			   --cover-package=simApi --cover-branches
-
-report:
-	coverage report -m
-
-coverageclean:
-	rm -rf cover
-	rm .coverage
 
 python:
 	$(PYTHON) setup.py build

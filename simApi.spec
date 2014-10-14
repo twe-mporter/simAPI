@@ -4,6 +4,7 @@ Name: simApi
 Version: 1.0.0
 Release: 2%{?dist}
 Summary: vEOS extension to serve custom eAPI responses
+License: BSD-3
 
 Group: Development/Libraries
 URL: http://eos.arista.com
@@ -30,9 +31,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,eosadmin,-)
-%{python_sitelib}/rphm*
-%{_bindir}/simAPI
-%config(noreplace) /persist/sys/simApi.conf
+%{python_sitelib}/SimApi.py*
+/etc/nginx/external_conf/simApi.conf
+/etc/uwsgi/simApi.ini
+/persist/sys/simApi.json
 
 %changelog
 * Tue Sep 23 2014 Andrei Dvornic <andrei@arista.com> - 1.0.0-0

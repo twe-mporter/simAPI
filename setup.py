@@ -16,8 +16,9 @@ setup(
       long_description=open('README.md').read(),
       author='Andrei Dvornic, Arista EOS+',
       author_email='andrei@arista.com',
+      license='BSD-3',
       url='http://eos.arista.com',
-      py_modules = ['SimApi'],
+      py_modules=['SimApi'],
       install_requires=INSTALL_REQUIREMENTS,
       data_files=[
           ('/etc/nginx/external_conf', ['conf/simApi.conf']),
