@@ -32,6 +32,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,eosadmin,-)
 %{python_sitelib}/SimApi.py*
+%{python_sitelib}/simApi-1.0.0-py2.7.egg-info/*
 /etc/nginx/external_conf/simApi.conf
 /etc/uwsgi/simApi.ini
 /persist/sys/simApi.json
