@@ -5,6 +5,7 @@ simAPI enables users to define their own custom responses to eAPI requests. This
  - simulate LLDP neighbors by serving a custom response to **show lldp neighbors**
  - simulate VMs with a large number of interfaces, without actually configuring them in the hypervisor (by customising the output of **show interfaces ...**)
  - create custom CLI commands and responses
+ - simulate eAPI responses for platform-specific CLI commands in vEOS
  - etc.
 
 ## Configuration
