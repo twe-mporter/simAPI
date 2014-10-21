@@ -97,8 +97,8 @@ Requests made to *simApi* may contain a mix of CLI commands, some of which are c
 ## Generating the extension from source code
 
  - run **make rpm** on a Fedora system (running the same Fedora version as the EOS target version)
- - copy the RPM from **rpmbuild** folder to vEOS node
- - use **swix create** from bash in order to generate the new extension file
+ - copy the RPM from the **rpmbuild** folder to a EOS node
+ - in EOS, use **swix create** bash command to generate the new extension file
 
 ## Limitations
 
