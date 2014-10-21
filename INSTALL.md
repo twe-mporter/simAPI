@@ -1,6 +1,6 @@
-Copy the extension to the switch using the copy command:
+Copy the extension to the switch using the **copy** command:
 ```
-EOS# copy *<simApi-1.0.0.swix>* extension:
+EOS# copy <simApi-1.0.0.swix> extension:
 ```
 
 Install the extension:
@@ -13,7 +13,7 @@ In order to make the extension persistent over reboot, use:
 EOS# copy installed-extensions boot-extensions
 ```
 
-If everything went well, *show extensions* should show:
+If everything went well, **show extensions** should show:
 ```
 EOS#show extensions 
 show extensions
