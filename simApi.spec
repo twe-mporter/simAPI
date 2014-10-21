@@ -1,7 +1,7 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name: simApi
-Version: 1.0.0
+Version: PLEASE_LEAVE_BLANK
 Release: 2%{?dist}
 Summary: vEOS extension to serve custom eAPI responses
 License: BSD-3
@@ -33,10 +33,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,eosadmin,-)
 %{python_sitelib}/SimApi.py*
 %{python_sitelib}/simApi-1.0.0-py2.7.egg-info/*
-/etc/nginx/external_conf/simApi.conf
-/etc/uwsgi/simApi.ini
-/persist/sys/simApi.json
+%{_sysconfdir}/nginx/external_conf/simApi.conf
+%{_sysconfdir}/uwsgi/simApi.ini
+%config(noreplace) /persist/sys/simApi.json
 
 %changelog
-* Tue Sep 23 2014 Andrei Dvornic <andrei@arista.com> - 1.0.0-0
+* Tue Sep 23 2014 Andrei Dvornic <andrei@arista.com> - 1.0.0-1
 - Initial release
