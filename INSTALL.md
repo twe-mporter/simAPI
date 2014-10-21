@@ -1,1 +1,25 @@
-TODO
+Copy the extension to the switch using the copy command:
+```
+EOS# copy *<simApi-1.0.0.swix>* extension:
+```
+
+Install the extension:
+```
+EOS# extension simApi-1.0.0.swix
+```
+
+In order to make the extension persistent over reboot, use:
+```
+EOS# copy installed-extensions boot-extensions
+```
+
+If everything went well, *show extensions* should show:
+```
+EOS#show extensions 
+show extensions
+Name                                       Version/Release           Status extension
+------------------------------------------ ------------------------- ------ ----
+simApi-1.0.0.swix                          1.0.0/1                   A, I      1
+
+A: available | NA: not available | I: installed | NI: not installed | F: forced
+```
