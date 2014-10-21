@@ -80,8 +80,8 @@ Here is an example:
 }
 ```
 
-The optional delay which can be configured for each CLI command can be used in roder to simulate eAPI responses which take a long time.
+The optional *delay* can be configured for each CLI command in order to simulate eAPI responses which take a long time.
 
-The configuration file contains two sections: "cmds" and "regexes". "cmds" provide exact matches for the CLI commands and are assesed first. If not match can be found in "cmds", the "regexes" section is considered. If not match can be foun there either, then the eAPI engine will be used in roder to return the result for a particular command.
+The configuration file contains two sections: **cmds** and **regexes**. **cmds** provides exact matches for the CLI commands and is assesed first. If not match can be found in **cmds**, the **regexes** section is considered. If not match can be foun there either, then the eAPI engine will be used in order to return the result for a particular command.
 
-Requests made to the simApi may contain a mix of CLI commands, some of which are configured in the configuration file and some which are served via the eAPI engine.
+Requests made to *simApi* may contain a mix of CLI commands, some of which are configured in the configuration file and some which are served via the eAPI engine.
