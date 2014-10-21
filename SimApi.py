@@ -14,11 +14,6 @@ import traceback
 import CapiAaa
 import CapiConstants
 import CapiRequestContext
-import Tracing
-
-
-traceHandle = Tracing.Handle('SimApi')
-trace = traceHandle.trace3
 
 EAPI_SOCKET = 'unix:/var/run/command-api.sock'
 SIM_API_CONFIG_FILE = '/persist/sys/simApi.json'
@@ -107,7 +102,6 @@ class SimApiApplication(object):
 
     def processRequest(self, request):
         '''Common implementation of all HTTP requests.'''
-        trace('processRequest entry')
         try:
             config = load_config()
 
@@ -143,12 +137,10 @@ class SimApiApplication(object):
                                         'id': request['id']})
                 return ('200 OK', 'application/json', None, result)
         except CapiRequestContext.HttpException as exc:
-            trace('processRequest HttpException', exc)
             return ('%s %s' % (exc.code, exc.name), exc.content_type,
                     exc.additionalHeaders,
                     exc.message)
         except Exception as exc:
-            trace('processRequest Exception', exc)
             traceback.print_exc()
             return ('500 Internal Server Error', 'text/html', None,
                     exc.message)

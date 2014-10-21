@@ -13,6 +13,19 @@ In order to make the extension persistent over reboot, use:
 EOS# copy installed-extensions boot-extensions
 ```
 
+Add the following configuration to EOS:
+```
+management api http-commands
+   protocol http[s]
+   protocol unix-socket
+   no shutdown
+```
+
+In order to make the configuration persistent over reboot, use:
+```
+EOS# copy running-config startup-config
+```
+
 If everything went well, **show extensions** should show:
 ```
 EOS#show extensions 

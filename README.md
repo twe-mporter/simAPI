@@ -1,6 +1,84 @@
-TODO - documentation
+# simAPI - custom eAPI responses
 
-# Title
+## Overview
+simAPI enables users to define their own custom responses to eAPI request. This can be useful in order to:
+ - simulate LLDP neighbors by serving a custom response to 'show lldp neighbors'
+ - simulate VMs with a large number of interfaces, without actually configuring them in the hypervisor (by customising the output of 'show interfaces ...')
+ - create custom CLI commands and responses
+ - etc.
 
-## Header
+## Configuration
+For installation instructions, please see INSTALL.md.
 
+Once the extension is installed, users can start sending JSON-RPC requests via an HTTP POST request to **http[s]://<hostname>/sim-api**. The format of the request is the same as foc eAPI.
+
+The response will be:
+ - either read from **/persist/sys/simApi.json**, if there
+ - the same as for a request made to **http[s]://<hostname>/sim-api**, if the CLI command is not configured in **/persist/sys/simApi.json**
+
+The configuration file (**/persist/sys/simApi.json**) is using the JSON format and is following the conventions from below:
+
+```
+{
+  // This is a comment
+  "cmds" : {
+     <COMMAND>:
+      { 
+        "delay" : <SECONDS>,     // Optional, default 0       
+        "result" : <RESULT>
+      },
+
+    /* This is
+       another 
+       comment. */
+
+     <COMMAND>:
+      { 
+        "result" : <RESULT>      // Yet another comment
+      },
+  },
+
+  "regexes" : {
+     <REGULAR EXPRESSION>:
+      { 
+        "delay" : <SECONDS>,      // Optional, default 0       
+        "result" : <RESULT>       // Can use $<NUMBER> to refer to 
+                                  // regex groups
+      },
+  }
+}
+```
+
+Here is an example:
+```
+{
+  // New CLI command
+  "cmds" : {
+     "show my version": 
+      { 
+        "result" : { "version" : 1 } 
+      },
+
+    /* Add
+       delay */
+
+    "show interfaces status": 
+      { 
+        "delay" : 3,
+        "result" : { "Ethernet1" : "up",
+                     "Ethernet2" : "down" } 
+      }
+  },
+
+  "regexes" : {
+     "show managament (.*)": 
+      { 
+        "delay" : 4,               // All "show management" 
+                                   // commands will have a delay
+        "result" : { "management" : "$1" } 
+      }
+  }
+}
+```
+
+A de
