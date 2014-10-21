@@ -16,7 +16,7 @@ setup(
       long_description=open('README.md').read(),
       author='Andrei Dvornic, Arista EOS+',
       author_email='andrei@arista.com',
-      license='BSD-3',
+      license='Arista Networks',
       url='http://eos.arista.com',
       py_modules=['SimApi'],
       install_requires=INSTALL_REQUIREMENTS,
