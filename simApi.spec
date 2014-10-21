@@ -31,12 +31,16 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,eosadmin,-)
-%{python_sitelib}/SimApi.py*
+%{python_sitelib}/SimApi.pyc
 %{python_sitelib}/simApi-1.0.0-py2.7.egg-info/*
 %{_sysconfdir}/nginx/external_conf/simApi.conf
 %{_sysconfdir}/uwsgi/simApi.ini
 %config(noreplace) /persist/sys/simApi.json
 
+%exclude
+%{python_sitelib}/SimApi.py
+%{python_sitelib}/SimApi.pyo
+
 %changelog
-* Tue Sep 23 2014 Andrei Dvornic <andrei@arista.com> - 1.0.0-1
+* Tue Oct 23 2014 Andrei Dvornic <andrei@arista.com> - 1.0.0-1
 - Initial release
