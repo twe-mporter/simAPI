@@ -29,6 +29,10 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post
+sudo service nginx restart
+sudo /usr/bin/uwsgi --ini /etc/uwsgi/simApi.ini > /var/log/simApi &
+
 %files
 %defattr(-,root,eosadmin,-)
 %{python_sitelib}/SimApi.pyc
@@ -36,10 +40,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/nginx/external_conf/simApi.conf
 %{_sysconfdir}/uwsgi/simApi.ini
 %config(noreplace) /persist/sys/simApi.json
-
-%exclude
-%{python_sitelib}/SimApi.py
-%{python_sitelib}/SimApi.pyo
+%exclude %{python_sitelib}/SimApi.py
+%exclude %{python_sitelib}/SimApi.pyo
 
 %changelog
 * Tue Oct 23 2014 Andrei Dvornic <andrei@arista.com> - 1.0.0-1

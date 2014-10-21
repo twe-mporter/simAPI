@@ -5,11 +5,8 @@
 #
 # useful targets:
 #   make clean ----- cleans distutils
-#   make install --- installs python modules
 #   make pylint ---- source code checks
 #   make rpm  ------ produce RPMs
-#   make sdist ----- builds a source distribution
-#   make tests ----- run the tests
 #
 ########################################################
 # variable section
@@ -30,7 +27,7 @@ RPMNVR = "$(NAME)-$(VERSION)-$(RPMRELEASE)"
 
 ########################################################
 
-all: clean python
+all: clean pylint rpm
 
 pylint:
 	find . -name \*.py | xargs pylint --rcfile .pylintrc  --msg-template '{path}:{line}: [{msg_id}] {msg}'
@@ -54,15 +51,6 @@ clean:
 	@echo "Removing simApi.egg-info"
 	@echo "---------------------------------------------"
 	rm -rf simApi.egg-info
-
-tests: clean
-	$(PYTHON) -m unittest discover ./test -v
-
-python:
-	$(PYTHON) setup.py build
-
-install:
-	$(PYTHON) setup.py install
 
 sdist: clean
 	$(PYTHON) setup.py sdist

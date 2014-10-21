@@ -119,9 +119,9 @@ class SimApiApplication(object):
                     'Only runCmds is mocked'
                 result = []
                 for cmd in request['params'][1]:
-                    result = processCommand(cmd, config)
-                    if result is not None:
-                        result.append(result)
+                    cmd_result = processCommand(cmd, config)
+                    if cmd_result is not None:
+                        result.append(cmd_result)
                     else:
                         req_format = 'json'
                         if len(request['params']) == 3:
