@@ -103,4 +103,4 @@ Requests made to *simApi* may contain a mix of CLI commands, some of which are c
 
 ## Limitations
 
-This extension is compatible with EOS-4.14.4 and later.
+This extension is compatible with EOS-4.14.4F and later.
