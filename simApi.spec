@@ -31,7 +31,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 sudo service nginx restart
-sudo /usr/bin/uwsgi --ini /etc/uwsgi/simApi.ini > /var/log/simApi &
+sudo /usr/bin/immortalize --daemonize /usr/bin/uwsgi --ini /etc/uwsgi/simApi.ini
 
 %files
 %defattr(-,root,eosadmin,-)

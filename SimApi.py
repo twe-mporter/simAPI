@@ -5,11 +5,12 @@
 # pylint: disable=C0103
 # pylint: disable=F0401
 
-import re
 import cjson
-import jsonrpclib
+import re
 import time
 import traceback
+
+import jsonrpclib
 
 import CapiAaa
 import CapiConstants
@@ -24,9 +25,17 @@ COMMENT_RE = re.compile(
     re.DOTALL | re.MULTILINE
 )
 
+
+class MissingConfigError(Exception):
+    pass
+
+class InvalidDelayError(Exception):
+    pass
+
+
 def load_config():
     with open(SIM_API_CONFIG_FILE) as config:
-        content = ''.join(config.readlines())
+        content = config.read()
 
         match = COMMENT_RE.search(content)
         while match:
@@ -44,8 +53,9 @@ def processCommand(cmd, config):
             match = re.match(regex, cmd)
             if match:
                 if 'result' not in value:
-                    raise Exception('"%s" matched "%s", but result is missing '
-                                    'from config' % (cmd, regex))
+                    raise MissingConfigError(
+                       '"%s" matched "%s", but result is missing '
+                       'from config' % (cmd, regex))
 
                 result = value['result']
                 if result is None:
@@ -58,22 +68,25 @@ def processCommand(cmd, config):
                 try:
                     time.sleep(int(value.get('delay', 0)))
                 except TypeError:
-                    raise Exception('Invalid delay value for "%s": %s' %
-                                    (regex, value['delay']))
+                    raise InvalidDelayError(
+                       'Invalid delay value for "%s": %s' %
+                       (regex, value['delay']))
                 return result
 
     if 'cmds' in config:
         for command, value in config['cmds'].iteritems():
             if cmd == command:
                 if 'result' not in value:
-                    raise Exception('"%s" matched "%s", but result is missing '
-                                    'from config' % (cmd, command))
+                    raise MissingConfigError(
+                       '"%s" matched "%s", but result is missing '
+                       'from config' % (cmd, command))
 
                 try:
                     time.sleep(int(value.get('delay', 0)))
                 except TypeError:
-                    raise Exception('Invalid delay value for "%s": %s' %
-                                    (command, value['delay']))
+                    raise InvalidDelayError(
+                       'Invalid delay value for "%s": %s' %
+                       (command, value['delay']))
 
                 result = value['result']
                 if result is None:
@@ -112,14 +125,23 @@ class SimApiApplication(object):
                 assert request['method'] == 'runCmds', \
                     'Only runCmds is mocked'
                 result = []
-                for cmd in request['params'][1]:
+
+                req_format = 'json'
+                params = request['params']
+                if isinstance(params, list):
+                    cmds = params[1]
+                    if len(params) == 3:
+                        req_format = params[2]
+                else:
+                    cmds = params['cmds']
+                    if 'format' in params:
+                        req_format = params['format']
+
+                for cmd in cmds:
                     cmd_result = processCommand(cmd, config)
                     if cmd_result is not None:
                         result.append(cmd_result)
                     else:
-                        req_format = 'json'
-                        if len(request['params']) == 3:
-                            req_format = request['params'][2]
                         try:
                             output = self.server.runCmds(
                                 1, [cmd], req_format)
