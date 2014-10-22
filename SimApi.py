@@ -148,9 +148,9 @@ class SimApiApplication(object):
                         except jsonrpclib.ProtocolError as exc:
                             result = cjson.encode({
                                 'jsonrpc': '2.0',
-                               'error': {'code': exc.message[0],
-                                         'message': exc.message[1]},
-                               'id': request['id']})
+                                'error': {'code': exc.message[0],
+                                          'message': exc.message[1]},
+                                'id': request['id']})
                             return ('1002 invalid command', 'application/json',
                                     None, result)
                         result.append(output[0])
