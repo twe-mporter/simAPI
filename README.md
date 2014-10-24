@@ -101,6 +101,15 @@ Requests made to *simApi* may contain a mix of CLI commands, some of which are c
  - copy the RPM from the **rpmbuild** folder to a EOS node
  - in EOS, use **swix create** bash command to generate the new extension file
 
+<pre>
+# <b>swix create --help</b>                                                           
+Usage: swix create [-f] ExtensionName.swix <primary-rpm> [additional-rpm] ...
+                                                                             
+Options:                                                                     
+  -h, --help   show this help message and exit                               
+  -f, --force                                                                
+</pre>
+
 ## Limitations
 
 This extension is compatible with EOS-4.14.4F and later.
