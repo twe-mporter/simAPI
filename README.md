@@ -112,4 +112,4 @@ Options:
 
 ## Limitations
 
-This extension is compatible with EOS-4.14.4F and later.
+This extension is compatible with EOS-4.14.5F and later.
