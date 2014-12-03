@@ -42,6 +42,9 @@ def load_config():
             content = content[:match.start()] + content[match.end():]
             match = COMMENT_RE.search(content)
 
+        # JSON only accepts double quotes
+        content = content.replace("'", '"')
+        
         return cjson.decode(content)
 
 def processCommand(cmd, config):
