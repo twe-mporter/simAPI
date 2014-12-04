@@ -95,6 +95,16 @@ The configuration file contains two sections: **cmds** and **regexes**. **cmds**
 
 Requests made to *simApi* may contain a mix of CLI commands, some of which are configured in the configuration file and some which are served via the eAPI engine.
 
+## Mapping simAPI to /command-api
+In order to send simAPI requests to the eAPI URL (**http[s]://\<hostname\>/command-api** instead of **http[s]://\<hostname\>/sim-api**):
+
+ - change the first line in simApi.conf as follows:
+
+    <pre>-location /sim-api {
+    +location =/command-api {</pre>
+
+ - run **sudo service nginx restart** in order to reload the config
+
 ## Generating the extension from source code
 
  - run **make rpm** on a Fedora system (running the same Fedora version as the EOS target version)
