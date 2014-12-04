@@ -98,12 +98,12 @@ Requests made to *simApi* may contain a mix of CLI commands, some of which are c
 ## Mapping simAPI to /command-api
 In order to send simAPI requests to the eAPI URL (**http[s]://\<hostname\>/command-api** instead of **http[s]://\<hostname\>/sim-api**):
 
- - change the first line in simApi.conf as follows:
+ - change the first line in **/etc/nginx/external_conf/simApi.conf** as follows:
 
     <pre>-location /sim-api {
     +location =/command-api {</pre>
 
- - run **sudo service nginx restart** in order to reload the config
+ - run **sudo service nginx restart** from bash in order to reload the config
 
 ## Generating the extension from source code
 
