@@ -8,6 +8,12 @@ simAPI enables users to define their own custom responses to eAPI requests. This
  - simulate eAPI responses for platform-specific CLI commands in vEOS
  - etc.
 
+## Installation
+
+     (Arista)# copy <SOURCE: simApi-VERSION.rpm> extensions:
+     (Arista)# extension simApi-VERSION.rpm
+     (Arista)# copy installed-extensions boot-extensions
+
 ## Configuration
 For installation instructions, please see INSTALL.md.
 
@@ -91,7 +97,7 @@ And here is how the results look in Python (example):
 
 The optional *delay* can be configured for each CLI command in order to simulate eAPI responses which take a long time.
 
-The configuration file contains two sections: **cmds** and **regexes**. **cmds** provides exact matches for the CLI commands and is assesed first. If not match can be found in **cmds**, the **regexes** section is considered. If not match can be foun there either, then the eAPI engine will be used in order to return the result for a particular command.
+The configuration file contains two sections: **cmds** and **regexes**. **cmds** provides exact matches for the CLI commands and is assesed first. If no match can be found in **cmds**, the **regexes** section is considered. If not match can be foun there either, then the eAPI engine will be used in order to return the result for a particular command.
 
 Requests made to *simApi* may contain a mix of CLI commands, some of which are configured in the configuration file and some which are served via the eAPI engine.
 
@@ -105,21 +111,10 @@ In order to send simAPI requests to the eAPI URL (**http[s]://\<hostname\>/comma
 
  - run **sudo service nginx restart** from bash in order to reload the config
 
-## Generating the extension from source code
+## Rebuilding the RPM from source code
 
  - run **make rpm** on a Fedora system (running the same Fedora version as the EOS target version)
- - copy the RPM from the **rpmbuild** folder to a EOS node
- - in EOS, use **swix create** bash command to generate the new extension file
-
-<pre>
-# <b>swix create --help</b>                                                           
-Usage: swix create [-f] ExtensionName.swix <primary-rpm> [additional-rpm] ...
-                                                                             
-Options:                                                                     
-  -h, --help   show this help message and exit                               
-  -f, --force                                                                
-</pre>
 
 ## Limitations
 
-This extension is compatible with EOS-4.14.5F and later.
+This extension is only compatible with EOS-4.14.5F and later.
