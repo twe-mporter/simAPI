@@ -109,13 +109,7 @@ class SimApiApplication(object):
                            '"%s" matched "%s", but result/plugin is missing '
                            'from config' % (cmd, command))
 
-                    try:
-                        time.sleep(int(value.get('delay', 0)))
-                    except TypeError:
-                        raise InvalidDelayError(
-                           'Invalid delay value for "%s": %s' %
-                           (command, value['delay']))
-
+                    result = None
                     if 'plugin' in value:
                         try:
                             plugin = imp.load_source(
@@ -131,6 +125,13 @@ class SimApiApplication(object):
                     elif 'result' in value:
                         result = value['result']
 
+                    try:
+                        time.sleep(int(value.get('delay', 0)))
+                    except TypeError:
+                        raise InvalidDelayError(
+                           'Invalid delay value for "%s": %s' %
+                           (command, value['delay']))
+
                     if result is None:
                         return {}
                     else:
@@ -140,24 +141,40 @@ class SimApiApplication(object):
             for regex, value in config['regexes'].iteritems():
                 match = re.match(regex, cmd)
                 if match:
-                    if 'result' not in value:
+                    if 'result' not in value and 'plugin' not in value:
                         raise MissingConfigError(
                            '"%s" matched "%s", but result is missing '
                            'from config' % (cmd, regex))
 
-                    result = value['result']
-                    if result is None:
-                        return {}
+                    result = None
+                    if 'plugin' in value:
+                        try:
+                            plugin = imp.load_source(
+                                value['plugin'], 
+                                '%s/%s' % (SIM_API_PLUGINS_DIR,
+                                           value['plugin']))
+                            result = plugin.main(self.server)
+                        except Exception as exc:
+                            raise PluginError(
+                                'Failed to load plugin %s: %s' % 
+                                (value['plugin'], exc))
+                            
+                    elif 'result' in value:
+                        result = value['result']
 
-                    for index, group in enumerate(match.groups()):
-                        result = eval(str(result).replace('$%d' % (index + 1),
-                                                          group))
                     try:
                         time.sleep(int(value.get('delay', 0)))
                     except TypeError:
                         raise InvalidDelayError(
                            'Invalid delay value for "%s": %s' %
                            (regex, value['delay']))
+
+                    if result is None:
+                        return {}
+
+                    for index, group in enumerate(match.groups()):
+                        result = eval(str(result).replace('$%d' % (index + 1),
+                                                          group))
                     return result
 
         return None

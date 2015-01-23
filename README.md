@@ -36,13 +36,8 @@ The configuration file (**/persist/sys/simApi.json**) is using the JSON format a
      <COMMAND>:
       { 
         "delay" : <SECONDS>,     // Optional, default 0       
-<<<<<<< HEAD
-        "plugin" : <PLUGIN>,
-        "result" : <RESULT>,
-=======
         "result" : <RESULT>,
         "plugin" : <PLUGIN>      // Yet another comment
->>>>>>> afa23962f4455c6ef9781dc5ef21b3bf2873cd34
       },
 
     /* This is
@@ -55,14 +50,8 @@ The configuration file (**/persist/sys/simApi.json**) is using the JSON format a
      <REGULAR EXPRESSION>:
       { 
         "delay" : <SECONDS>,      // Optional, default 0       
-<<<<<<< HEAD
         "plugin" : <PLUGIN>,
         "result" : <RESULT>       // Can use $<NUMBER> to refer to 
-=======
-        "result" : <RESULT>,      // Can use $<NUMBER> to refer to 
->>>>>>> afa23962f4455c6ef9781dc5ef21b3bf2873cd34
-                                  // regex groups
-        "plugin" :  <PLUGIN>
       },
   }
 }
@@ -70,11 +59,11 @@ The configuration file (**/persist/sys/simApi.json**) is using the JSON format a
 
 The optional *delay* can be configured for each CLI command in order to simulate eAPI responses which take a long time.
 
-The configuration file contains two sections: **cmds** and **regexes**. **cmds** provides exact matches for the CLI commands and is assesed first. If no match can be found in **cmds**, the **regexes** section is considered. If not match can be foun there either, then the eAPI engine will be used in order to return the result for a particular command.
+The configuration file contains two sections: **cmds** and **regexes**. **cmds** provides exact matches for the CLI commands and is assesed first. If no match can be found in **cmds**, the **regexes** section is considered. If not match can be found there either, then the eAPI engine will be used in order to return the native result for a particular command.
 
-Once a match is made in other **cmds** and **regexes**, the response will be:
+Once a match is made in either **cmds** and **regexes**, the response will be:
  - the return value of the **main** function in the plugin, if the **plugin** attribute is specified
- - the value of the **result** attrbiute, if the **plugin** attribute is NOT specified
+ - the value of the **result** attribute, if the **plugin** attribute is NOT specified
 
 Requests made to *simApi* may contain a mix of CLI commands, some of which are configured in the configuration file and some which are served via the eAPI engine.
 
@@ -127,7 +116,7 @@ And here is how the results look in Python (example):
 
 ## Plugins
 
-Plugins must be written in Python and added to **/persist/sys/simAPI/plugins**. They must have a **main** method, which has a single input argument called *server*. This attribute is a jsonrpc.Server object which cab ne used in order to access the eAPI underlying engine on the switch.
+Plugins must be written in Python and added to **/persist/sys/simAPI/plugins**. They must have a **main** method, which has a single input argument called *server*. This attribute is a jsonrpc.Server object which can be used in order to access the underlying eAPI engine on the switch.
 
 Here is an example:
 
