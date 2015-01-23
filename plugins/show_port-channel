@@ -1,6 +1,71 @@
-#!/usr/bin/env python
-# Copyright (c) 2014 Arista Networks, Inc.  All rights reserved.
-# Arista Networks, Inc. Confidential and Proprietary.
+#
+# Copyright (c) 2014, Arista Networks, Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#   Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions and the following disclaimer in the
+#   documentation and/or other materials provided with the distribution.
+#
+#   Neither the name of Arista Networks nor the names of its
+#   contributors may be used to endorse or promote products derived from
+#   this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ARISTA NETWORKS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# This plugin parses the test output of "show port-channel" to a JSON
+# structure.
+#
+# The output has the following format:
+#
+# [ { 'name' : <port-channel>,
+#     'active' : [ { 'port': <port> } ],
+#     'inactive' : [ { 'port' : <port>,
+#                      'reason' : <reason> } ] } ]
 
 def main(server):
-    pass
+    result = []
+    output = server.runCmds(1, ['show port-channel'], 'text')[0]['output']
+    output = [x for x in output.split('Port Channel') if x]
+    for pout in output:
+        po_result = {}
+
+        tokens = [x for x in pout.split('\n') if x]
+        name = tokens[0].strip()[:-1]
+        po_result['name'] = name
+
+        po_result['active'] = []
+        active_ports = tokens[1]
+        if 'No Active Ports' not in active_ports:
+            for port in active_ports.split()[2:]:
+                po_result['active'] += [{'port' : port}]
+
+        po_result['inactive'] = []
+        inactive_ports = tokens[5:]
+        for port in inactive_ports:
+            port = port.split()
+            po_result['inactive'] += [{'port' : port[0],
+                                       'reason' : '\n'.join(port[1:])}]
+
+        result += [po_result]
+
+    return result
+        
+            
+        

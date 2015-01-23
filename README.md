@@ -5,19 +5,34 @@ simAPI enables users to define their own custom responses to eAPI requests. This
  - simulate LLDP neighbors by serving a custom response to **show lldp neighbors**
  - simulate VMs with a large number of interfaces, without actually configuring them in the hypervisor (by customising the output of **show interfaces ...**)
  - create custom CLI commands and responses
+ - convert text/JSON output from eAPI commands to custom JSON responses
  - simulate eAPI responses for platform-specific CLI commands in vEOS
  - etc.
 
 ## Installation
 
-     (Arista)# copy <SOURCE: simApi-VERSION.rpm> extensions:
-     (Arista)# extension simApi-VERSION.rpm
-     (Arista)# copy installed-extensions boot-extensions
+```
+Arista# copy <SOURCE: simApi-VERSION.rpm> extensions:
+Arista# extension simApi-VERSION.rpm
+Arista# copy installed-extensions boot-extensions
+
+Arista(config)# management api http-commands
+Arista(config-mgmt-api-http-cmds)# protocol unix-socket
+```
 
 ## Configuration
 For installation instructions, please see INSTALL.md.
 
 Once the extension is installed, users can start sending JSON-RPC requests via an HTTP POST request to **http[s]://\<hostname\>/sim-api**. The format of the request is the same as for eAPI.
+
+In order to send simAPI requests to the eAPI URL (**http[s]://\<hostname\>/command-api** instead of **http[s]://\<hostname\>/sim-api**):
+
+ - change the first line in **/etc/nginx/external_conf/simApi.conf** as follows:
+
+    <pre>-location /sim-api {
+    +location =/command-api {</pre>
+
+ - run **sudo service nginx restart** from bash in order to reload the config
 
 The response will be:
  - either read from **/persist/sys/simApi.json**, if there
@@ -32,7 +47,8 @@ The configuration file (**/persist/sys/simApi.json**) is using the JSON format a
      <COMMAND>:
       { 
         "delay" : <SECONDS>,     // Optional, default 0       
-        "result" : <RESULT>
+        "plugin" : <PLUGIN>,
+        "result" : <RESULT>,
       },
 
     /* This is
@@ -49,12 +65,23 @@ The configuration file (**/persist/sys/simApi.json**) is using the JSON format a
      <REGULAR EXPRESSION>:
       { 
         "delay" : <SECONDS>,      // Optional, default 0       
+        "plugin" : <PLUGIN>,
         "result" : <RESULT>       // Can use $<NUMBER> to refer to 
                                   // regex groups
       },
   }
 }
 ```
+
+The optional *delay* can be configured for each CLI command in order to simulate eAPI responses which take a long time.
+
+The configuration file contains two sections: **cmds** and **regexes**. **cmds** provides exact matches for the CLI commands and is assesed first. If no match can be found in **cmds**, the **regexes** section is considered. If not match can be foun there either, then the eAPI engine will be used in order to return the result for a particular command.
+
+Once a match is made in other **cmds** and **regexes**, the response will be:
+ - the return value of the **main** function in the plugin, if the **plugin** attribute is specified
+ - the value of the **result** attrbiute, if the **plugin** attribute is NOT specified
+
+Requests made to *simApi* may contain a mix of CLI commands, some of which are configured in the configuration file and some which are served via the eAPI engine.
 
 Here is an example:
 ```
@@ -64,6 +91,14 @@ Here is an example:
      "show my version": 
       { 
         "result" : { "version" : 1 } 
+      },
+
+     "show port-channel": 
+      { 
+        "plugin" : "show_port-channel",
+
+       // ignored because plugin takes precedence
+        "result" : { "1" : 1 } 
       },
 
     /* Add
@@ -95,21 +130,19 @@ And here is how the results look in Python (example):
 [{u'version': 1}]
 ```
 
-The optional *delay* can be configured for each CLI command in order to simulate eAPI responses which take a long time.
+## Plugins
 
-The configuration file contains two sections: **cmds** and **regexes**. **cmds** provides exact matches for the CLI commands and is assesed first. If no match can be found in **cmds**, the **regexes** section is considered. If not match can be foun there either, then the eAPI engine will be used in order to return the result for a particular command.
+Plugins must be written in Python and added to **/persist/sys/simAPI/plugins**. They must have a **main** method, which has a single input argument called *server*. This attribute is a jsonrpc.Server object which cab ne used in order to access the eAPI underlying engine on the switch.
 
-Requests made to *simApi* may contain a mix of CLI commands, some of which are configured in the configuration file and some which are served via the eAPI engine.
+Here is an example:
 
-## Mapping simAPI to /command-api
-In order to send simAPI requests to the eAPI URL (**http[s]://\<hostname\>/command-api** instead of **http[s]://\<hostname\>/sim-api**):
+```
+# force eAPI to always return the 'text' output for 'show version'
+def main(server):
+    return server.runCmds(1, ['show version'], 'text')[0]
+```
 
- - change the first line in **/etc/nginx/external_conf/simApi.conf** as follows:
-
-    <pre>-location /sim-api {
-    +location =/command-api {</pre>
-
- - run **sudo service nginx restart** from bash in order to reload the config
+Adding a new plugin does NOT require restarting any services.
 
 ## Rebuilding the RPM from source code
 

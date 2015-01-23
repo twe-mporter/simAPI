@@ -29,6 +29,7 @@ all: clean pylint rpm
 
 pylint:
 	find . -name \*.py | xargs pylint 
+	pylint plugins/*
 
 clean:
 	@echo "---------------------------------------------"
