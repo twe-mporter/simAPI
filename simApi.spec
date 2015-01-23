@@ -39,7 +39,8 @@ sudo /usr/bin/immortalize --daemonize /usr/bin/uwsgi --ini /etc/uwsgi/simApi.ini
 %{python_sitelib}/simApi-%{version}-py2.7.egg-info/*
 %{_sysconfdir}/nginx/external_conf/simApi.conf
 %{_sysconfdir}/uwsgi/simApi.ini
-%config(noreplace) /persist/sys/simApi.json
+%config(noreplace) /persist/sys/simAPI/simApi.json
+%config /persist/sys/simAPI/plugins/show_port-channel
 %exclude %{python_sitelib}/SimApi.py
 %exclude %{python_sitelib}/SimApi.pyo
 

@@ -22,8 +22,6 @@ VERSION := $(shell cat VERSION)
 # RPM build parameters
 RPMSPECDIR = .
 RPMSPEC = $(RPMSPECDIR)/simApi.spec
-RPMRELEASE = 1
-RPMNVR = "$(NAME)-$(VERSION)-$(RPMRELEASE)"
 
 ########################################################
 
@@ -58,7 +56,7 @@ sdist: clean
 rpmcommon: sdist
 	@mkdir -p rpmbuild
 	@cp dist/*.gz rpmbuild/
-	@sed -e 's#^Version:.*#Version: $(VERSION)#' -e 's#^Release:.*#Release: $(RPMRELEASE)#' $(RPMSPEC) >rpmbuild/$(NAME).spec
+	@sed -e 's#^Version:.*#Version: $(VERSION)#' $(RPMSPEC) >rpmbuild/$(NAME).spec
 
 rpm: rpmcommon
 	@rpmbuild --define "_topdir %(pwd)/rpmbuild" \
@@ -67,11 +65,12 @@ rpm: rpmcommon
 	--define "_srcrpmdir %{_topdir}" \
 	--define "_specdir $(RPMSPECDIR)" \
 	--define "_sourcedir %{_topdir}" \
-	--define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.rpm" \
+	--define "_rpmfilename %%{NAME}-%%{VERSION}.rpm" \
 	--define "__python /usr/bin/python" \
 	-ba rpmbuild/$(NAME).spec
 	@rm -f rpmbuild/$(NAME).spec
+	@rm -f rpmbuild/*.src.rpm
 	@echo "---------------------------------------------"
 	@echo "simApi RPM is built:"
-	@echo "    rpmbuild/$(RPMNVR).rpm"
+	@echo "    rpmbuild/$(NAME)-$(VERSION).rpm"
 	@echo "---------------------------------------------"

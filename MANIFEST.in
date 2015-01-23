@@ -2,3 +2,4 @@ include CHANGELOG.md INSTALL.md README.md
 include LICENSE VERSION
 include Makefile simApi.spec
 recursive-include conf *
+recursive-include plugins *

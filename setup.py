@@ -25,6 +25,6 @@ setup(
           ('/etc/nginx/external_conf', ['conf/simApi.conf']),
           ('/etc/uwsgi', ['conf/simApi.ini']),
           ('/persist/sys/simAPI', ['conf/simApi.json']),
-          ('/persist/sys/simAPI/plugins', glob('plugins/*'))
-      ]
-)
+          ('/persist/sys/simAPI/plugins', glob('plugins/*')),
+          ]
+      )
