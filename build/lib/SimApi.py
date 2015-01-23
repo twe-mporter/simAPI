@@ -18,9 +18,7 @@ import CapiConstants
 import CapiRequestContext
 
 EAPI_SOCKET = 'unix:/var/run/command-api.sock'
-
-SIM_API_CONFIG_FILE = '/persist/sys/simAPI/simApi.json'
-SIM_API_PLUGINS_DIR = '/persist/sys/simAPI/plugins'
+SIM_API_CONFIG_FILE = '/persist/sys/simApi.json'
 
 # Regular expression for comments
 COMMENT_RE = re.compile(
@@ -91,10 +89,9 @@ class SimApiApplication(object):
 
                     if 'plugin' in value:
                         try:
-                            plugin = imp.load_source(
-                                None, 
-                                '%s/%s' % (SIM_API_PLUGINS_DIR,
-                                           value['plugin']))
+                            plugin = imp.load_source(None, 
+                                                     'plugins/%s' % 
+                                                     value['plugin'])
                             result = plugin.main(self.server)
                         except Exception as exc:
                             raise PluginError(

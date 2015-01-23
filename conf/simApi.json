@@ -2,9 +2,19 @@
   // This is a comment
   "cmds" : {
      "show version": 
+
       { 
         "result" : { "1" : 1 } 
       },
+
+     "show port-channel": 
+      { 
+        "plugin" : "show_port-channel",
+
+       // ignored because plugin takes precedence
+        "result" : { "1" : 1 } 
+      },
+
 
     /* This is
        another 

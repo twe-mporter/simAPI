@@ -2,6 +2,7 @@
 # Copyright (c) 2014 Arista Networks, Inc.  All rights reserved.
 # Arista Networks, Inc. Confidential and Proprietary.
 
+from glob import glob
 from setuptools import setup
 
 INSTALL_REQUIREMENTS = [
@@ -23,6 +24,7 @@ setup(
       data_files=[
           ('/etc/nginx/external_conf', ['conf/simApi.conf']),
           ('/etc/uwsgi', ['conf/simApi.ini']),
-          ('/persist/sys', ['conf/simApi.json'])
+          ('/persist/sys/simAPI', ['conf/simApi.json']),
+          ('/persist/sys/simAPI/plugins', glob('plugins/*'))
       ]
 )
