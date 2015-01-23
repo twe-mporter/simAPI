@@ -30,6 +30,7 @@
 
 # pylint: disable=C0103
 # pylint: disable=F0401
+# pylint: disable=R0912
 
 import cjson
 import imp
