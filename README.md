@@ -10,7 +10,7 @@ simAPI enables users to define their own custom responses to eAPI requests. This
 
 ## Installation
 
-     (Arista)# copy <SOURCE: simApi-VERSION.rpm> extensions:
+     (Arista)# copy https://github.com/arista-eosplus/simAPI/blob/master/simApi-<VERSION>.rpm extension:
      (Arista)# extension simApi-VERSION.rpm
      (Arista)# copy installed-extensions boot-extensions
 
@@ -32,25 +32,23 @@ The configuration file (**/persist/sys/simApi.json**) is using the JSON format a
      <COMMAND>:
       { 
         "delay" : <SECONDS>,     // Optional, default 0       
-        "result" : <RESULT>
+        "result" : <RESULT>,
+        "plugin" : <PLUGIN>      // Yet another comment
       },
 
     /* This is
        another 
        comment. */
 
-     <COMMAND>:
-      { 
-        "result" : <RESULT>      // Yet another comment
-      },
-  },
+},
 
   "regexes" : {
      <REGULAR EXPRESSION>:
       { 
         "delay" : <SECONDS>,      // Optional, default 0       
-        "result" : <RESULT>       // Can use $<NUMBER> to refer to 
+        "result" : <RESULT>,      // Can use $<NUMBER> to refer to 
                                   // regex groups
+        "plugin" :  <PLUGIN>
       },
   }
 }
@@ -64,6 +62,14 @@ Here is an example:
      "show my version": 
       { 
         "result" : { "version" : 1 } 
+      },
+
+     "show port-channel":                        
+      {                                          
+        "plugin" : "show_port-channel",          
+                                                 
+       // ignored because plugin takes precedence
+        "result" : { "1" : 1 }                   
       },
 
     /* Add
