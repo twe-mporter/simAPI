@@ -32,7 +32,7 @@ EOS# show boot-extensions
 
 Copy the extension to the switch using the **copy** command:
 ```
-EOS# copy <simApi-<version>.swix> extension:
+EOS# copy https://github.com/arista-eosplus/simAPI/blob/master/simApi-<version>.rpm extension:
 ```
 
 Install the extension:

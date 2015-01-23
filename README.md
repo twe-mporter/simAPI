@@ -9,17 +9,6 @@ simAPI enables users to define their own custom responses to eAPI requests. This
  - simulate eAPI responses for platform-specific CLI commands in vEOS
  - etc.
 
-## Installation
-
-```
-Arista# copy <SOURCE: simApi-VERSION.rpm> extensions:
-Arista# extension simApi-VERSION.rpm
-Arista# copy installed-extensions boot-extensions
-
-Arista(config)# management api http-commands
-Arista(config-mgmt-api-http-cmds)# protocol unix-socket
-```
-
 ## Configuration
 For installation instructions, please see INSTALL.md.
 
@@ -47,27 +36,33 @@ The configuration file (**/persist/sys/simApi.json**) is using the JSON format a
      <COMMAND>:
       { 
         "delay" : <SECONDS>,     // Optional, default 0       
+<<<<<<< HEAD
         "plugin" : <PLUGIN>,
         "result" : <RESULT>,
+=======
+        "result" : <RESULT>,
+        "plugin" : <PLUGIN>      // Yet another comment
+>>>>>>> afa23962f4455c6ef9781dc5ef21b3bf2873cd34
       },
 
     /* This is
        another 
        comment. */
 
-     <COMMAND>:
-      { 
-        "result" : <RESULT>      // Yet another comment
-      },
-  },
+},
 
   "regexes" : {
      <REGULAR EXPRESSION>:
       { 
         "delay" : <SECONDS>,      // Optional, default 0       
+<<<<<<< HEAD
         "plugin" : <PLUGIN>,
         "result" : <RESULT>       // Can use $<NUMBER> to refer to 
+=======
+        "result" : <RESULT>,      // Can use $<NUMBER> to refer to 
+>>>>>>> afa23962f4455c6ef9781dc5ef21b3bf2873cd34
                                   // regex groups
+        "plugin" :  <PLUGIN>
       },
   }
 }
