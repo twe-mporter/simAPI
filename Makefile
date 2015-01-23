@@ -28,8 +28,8 @@ RPMSPEC = $(RPMSPECDIR)/simApi.spec
 all: clean pylint rpm
 
 pylint:
-	find . -name \*.py | xargs pylint 
-	pylint plugins/*
+	find . -name \*.py | xargs pylint --rcfile .pylintrc
+	pylint --rcfile .pylintrc plugins/*
 
 clean:
 	@echo "---------------------------------------------"
