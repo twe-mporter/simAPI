@@ -123,7 +123,6 @@ class SimApiApplication(object):
                         return {}
 
                     for index, group in enumerate(match.groups()):
-                        # pylint: disable=W0123
                         result = eval(str(result).replace('$%d' % (index + 1),
                                                           group))
                     try:

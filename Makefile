@@ -30,7 +30,7 @@ RPMNVR = "$(NAME)-$(VERSION)-$(RPMRELEASE)"
 all: clean pylint rpm
 
 pylint:
-	find . -name \*.py | xargs pylint --rcfile .pylintrc  --msg-template '{path}:{line}: [{msg_id}] {msg}'
+	find . -name \*.py | xargs pylint 
 
 clean:
 	@echo "---------------------------------------------"
