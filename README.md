@@ -7,6 +7,7 @@ simAPI enables users to define their own custom responses to eAPI requests. This
  - create custom CLI commands and responses
  - convert text/JSON output from eAPI commands to custom JSON responses
  - simulate eAPI responses for platform-specific CLI commands in vEOS
+ - return eAPI results in non-JSON format (e.g. XML)
  - etc.
 
 ## Configuration
