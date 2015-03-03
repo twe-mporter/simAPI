@@ -26,10 +26,10 @@ In order to send simAPI requests to the eAPI URL (**http[s]://\<hostname\>/comma
  - run **sudo service nginx restart** from bash in order to reload the config
 
 The response will be:
- - either read from **/persist/sys/simApi.json**, if there
- - the same as for a request made to **http[s]://\<hostname\>/command-api**, if the CLI command is not configured in **/persist/sys/simApi.json**
+ - either read from **/persist/sys/simAPI/simApi.json**, if there
+ - the same as for a request made to **http[s]://\<hostname\>/command-api**, if the CLI command is not configured in **/persist/sys/simAPI/simApi.json**
 
-The configuration file (**/persist/sys/simApi.json**) is using the JSON format and is following the conventions below:
+The configuration file (**/persist/sys/simAPI/simApi.json**) is using the JSON format and is following the conventions below:
 
 ```
 {
