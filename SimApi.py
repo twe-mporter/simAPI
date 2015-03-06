@@ -116,7 +116,7 @@ class SimApiApplication(object):
                                 value['plugin'], 
                                 '%s/%s' % (SIM_API_PLUGINS_DIR,
                                            value['plugin']))
-                            result = plugin.main(self.server)
+                            result = plugin.main(self.server, cmd)
                         except Exception as exc:
                             raise PluginError(
                                 'Failed to load plugin %s: %s' % 

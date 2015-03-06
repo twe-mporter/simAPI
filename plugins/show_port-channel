@@ -40,7 +40,10 @@
 
 # pylint: disable=C0103
 
-def main(server):
+def main(server, cmd=None):
+    if cmd != 'show port-channel':
+        return None
+    
     result = []
     output = server.runCmds(1, ['show port-channel'], 'text')[0]['output']
     output = [x for x in output.split('Port Channel') if x]
