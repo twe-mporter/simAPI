@@ -203,23 +203,23 @@ class SimApiApplication(object):
                     if 'format' in params:
                         req_format = params['format']
 
-                for cmd in cmds:
+                for index, cmd in enumerate(cmds):
                     cmd_result = self.processCommand(cmd, config)
                     if cmd_result is not None:
                         result.append(cmd_result)
                     else:
                         try:
                             output = self.server.runCmds(
-                                1, [cmd], req_format)
+                                1, cmds[:index+1], req_format)[-1]
+                            result.append(output)
                         except jsonrpclib.ProtocolError as exc:
                             result = cjson.encode({
-                                'jsonrpc': '2.0',
-                                'error': {'code': exc.message[0],
-                                          'message': exc.message[1]},
-                                'id': request['id']})
+                                    'jsonrpc': '2.0',
+                                    'error': {'code': exc.message[0],
+                                              'message': exc.message[1]},
+                                    'id': request['id']})
                             return ('1002 invalid command', 'application/json',
                                     None, result)
-                        result.append(output[0])
                 result = cjson.encode({'jsonrpc': '2.0',
                                         'result': result,
                                         'id': request['id']})
