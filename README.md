@@ -14,20 +14,20 @@ simAPI enables users to define their own custom responses to eAPI requests. This
 ## Configuration
 For installation instructions, please see INSTALL.md.
 
-Once the extension is installed, users can start sending JSON-RPC requests via an HTTP POST request to **http[s]://\<hostname\>/sim-api**. The format of the request is the same as for eAPI.
-
-In order to send simAPI requests to the eAPI URL (**http[s]://\<hostname\>/command-api** instead of **http[s]://\<hostname\>/sim-api**):
-
- - change the first line in **/etc/nginx/external_conf/simApi.conf** as follows:
-
-    <pre>-location /sim-api {
-    +location =/command-api {</pre>
-
- - run **sudo service nginx restart** from bash in order to reload the config
+Once the extension is installed, users can start sending JSON-RPC requests via an HTTP POST request to **http[s]://\<hostname\>/command-api**. The format of the request is the same as for eAPI.
 
 The response will be:
  - either read from **/persist/sys/simAPI/simApi.json**, if there
  - the same as for a request made to **http[s]://\<hostname\>/command-api**, if the CLI command is not configured in **/persist/sys/simAPI/simApi.json**
+
+In order to send simAPI requests to an URL different that the eAPI URL (**http[s]://\<hostname\>/sim-api** instead of **http[s]://\<hostname\>/command-api**):
+
+ - change the first line in **/etc/nginx/external_conf/simApi.conf** as follows:
+
+    <pre>-location =/command-api {
+    +location /sim-api {</pre>
+
+ - run **sudo service nginx restart** from bash in order to reload the config
 
 The configuration file (**/persist/sys/simAPI/simApi.json**) is using the JSON format and is following the conventions below:
 
