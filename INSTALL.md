@@ -4,25 +4,25 @@ If another extension with the same name is already installed, first remove that:
 EOS# show extensions
 Name                                       Version/Release           Status extension
 ------------------------------------------ ------------------------- ------ ----
-simApi-<version>.swix                      <version>/<release>       A, I      1
+simApi-<version>.rpm                       <version>/<release>       A, I      1
 
 A: available | NA: not available | I: installed | NI: not installed | F: forced
 
-EOS# no extension simApi-<version>.swix
+EOS# no extension simApi-<version>.rpm
 EOS# show extensions
 show extensions
 Name                                       Version/Release           Status extension
 ------------------------------------------ ------------------------- ------ ----
-simApi-<version>.swix                      <version>/<release>           A, NI     1
+simApi-<version>.rpm                       <version>/<release>           A, NI     1
 
 A: available | NA: not available | I: installed | NI: not installed | F: forced
 
-EOS# delete extension:simApi-<version>.swix
+EOS# delete extension:simApi-<version>.rpm
 EOS# show extensions
 No extensions are available
 
 EOS# show boot-extensions
-simApi-<version>.swix
+simApi-<version>.rpm
 
 EOS# copy installed-extensions boot-extensions
 Copy completed successfully.
@@ -32,12 +32,12 @@ EOS# show boot-extensions
 
 Copy the extension to the switch using the **copy** command:
 ```
-EOS# copy https://github.com/arista-eosplus/simAPI/blob/master/simApi-<version>.rpm extension:
+EOS# copy https://github.com/arista-eosplus/simAPI/raw/master/simApi-<version>.rpm extension:
 ```
 
 Install the extension:
 ```
-EOS# extension simApi-<version>.swix
+EOS# extension simApi-<version>.rpm
 ```
 
 In order to make the extension persistent over reboot, use:
@@ -64,7 +64,7 @@ EOS#show extensions
 show extensions
 Name                                       Version/Release           Status extension
 ------------------------------------------ ------------------------- ------ ----
-simApi-<version>.swix                      <version>/<release>           A, I      1
+simApi-<version>.rpm                       <version>/<release>           A, I      1
 
 A: available | NA: not available | I: installed | NI: not installed | F: forced
 ```
