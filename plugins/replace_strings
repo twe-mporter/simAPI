@@ -28,45 +28,42 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# This plugin parses the test output of "show port-channel" to a JSON
-# structure.
-#
-# The output has the following format:
-#
-# [ { 'name' : <port-channel>,
-#     'active' : [ { 'port': <port> } ],
-#     'inactive' : [ { 'port' : <port>,
-#                      'reason' : <reason> } ] } ]
+# This plugin replaces strings in "show" commands.
 
-# pylint: disable=C0103, W0613
+# pylint: disable=C0103
+
+import jsonrpclib
+
+# Example
+REPLACEMENTS = {
+    # This is for JSON mode - the inner quotes are needed
+    # in order to avoid replacing into Ethernet49/1.
+    "'Ethernet4'": "'Ethernet60/1'",
+
+    # This is for TEXT mode - the extra space is needed
+    # in order to avoid replacing into Ethernet49/1.
+    "Et4 ": "Et60/1 ",
+    }
 
 def main(server, cmd=None, params=None):
-    if cmd != 'show port-channel':
+
+    req_format = 'json'
+    if 'format' in params:
+        req_format = params['format']
+    elif len(params) == 3:
+        req_format = params[-1]
+
+    try:
+        output = server.runCmds(1, [cmd], req_format)
+    except jsonrpclib.ProtocolError:
         return None
-    
-    result = []
-    output = server.runCmds(1, ['show port-channel'], 'text')[0]['output']
-    output = [x for x in output.split('Port Channel') if x]
-    for pout in output:
-        po_result = {}
 
-        tokens = [x for x in pout.split('\n') if x]
-        name = tokens[0].strip()[:-1]
-        po_result['name'] = name
+    string_output = str(output[0])
 
-        po_result['active'] = []
-        active_ports = tokens[1]
-        if 'No Active Ports' not in active_ports:
-            for port in active_ports.split()[2:]:
-                po_result['active'] += [{'port' : port}]
+    for init, replace in REPLACEMENTS.iteritems():
+        string_output = string_output.replace(init, 
+                                              replace)
+    output = eval(string_output)
 
-        po_result['inactive'] = []
-        inactive_ports = tokens[5:]
-        for port in inactive_ports:
-            port = port.split()
-            po_result['inactive'] += [{'port' : port[0],
-                                       'reason' : '\n'.join(port[1:])}]
+    return output
 
-        result += [po_result]
-
-    return result

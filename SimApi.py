@@ -97,7 +97,7 @@ class SimApiApplication(object):
                            headers)
         return [body]
 
-    def processCommand(self, cmd, config):
+    def processCommand(self, cmd, config, params):
         if type(cmd) != str:
             return None
 
@@ -116,7 +116,7 @@ class SimApiApplication(object):
                                 value['plugin'], 
                                 '%s/%s' % (SIM_API_PLUGINS_DIR,
                                            value['plugin']))
-                            result = plugin.main(self.server, cmd)
+                            result = plugin.main(self.server, cmd, params)
                         except Exception as exc:
                             raise PluginError(
                                 'Failed to load plugin %s: %s' % 
@@ -153,7 +153,7 @@ class SimApiApplication(object):
                                 value['plugin'], 
                                 '%s/%s' % (SIM_API_PLUGINS_DIR,
                                            value['plugin']))
-                            result = plugin.main(self.server)
+                            result = plugin.main(self.server, cmd, params)
                         except Exception as exc:
                             raise PluginError(
                                 'Failed to load plugin %s: %s' % 
@@ -202,9 +202,11 @@ class SimApiApplication(object):
                     cmds = params['cmds']
                     if 'format' in params:
                         req_format = params['format']
+                    elif len(params) == 3:
+                        req_format = params[-1]
 
                 for index, cmd in enumerate(cmds):
-                    cmd_result = self.processCommand(cmd, config)
+                    cmd_result = self.processCommand(cmd, config, params)
                     if cmd_result is not None:
                         result.append(cmd_result)
                     else:
