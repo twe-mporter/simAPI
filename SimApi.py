@@ -230,7 +230,7 @@ class SimApiApplication(object):
             return ('%s %s' % (exc.code, exc.name), exc.content_type,
                     exc.additionalHeaders,
                     exc.message)
-        except Exception as exc:
+        except (Exception, cjson.DecodeError) as exc:
             traceback.print_exc()
             return ('500 Internal Server Error', 'text/html', None,
                     exc.message)
