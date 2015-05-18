@@ -20,7 +20,7 @@ The response will be:
  - either read from **/persist/sys/simAPI/simApi.json**, if there
  - the same as for a request made to **http[s]://\<hostname\>/command-api**, if the CLI command is not configured in **/persist/sys/simAPI/simApi.json**
 
-In order to send simAPI requests to an URL different that the eAPI URL (**http[s]://\<hostname\>/sim-api** instead of **http[s]://\<hostname\>/command-api**):
+In order to send simAPI requests to an URL different than the eAPI URL (**http[s]://\<hostname\>/sim-api** instead of **http[s]://\<hostname\>/command-api**):
 
  - change the first line in **/etc/nginx/external_conf/simApi.conf** as follows:
 
