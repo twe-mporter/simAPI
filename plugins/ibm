@@ -1,0 +1,153 @@
+# Copyright (c) 2015, Arista Networks, Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#   Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions and the following disclaimer in the
+#   documentation and/or other materials provided with the distribution.
+#
+#   Neither the name of Arista Networks nor the names of its
+#   contributors may be used to endorse or promote products derived from
+#   this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ARISTA NETWORKS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# pylint: disable=R0914, R0912
+
+
+import os
+import re
+import traceback
+
+from ibm_lib import load_config   # pylint: disable=F0401
+from os.path import isdir, isfile, join
+
+def ports(config):
+    try:
+        return [f for f in os.listdir(config['log_dir']) 
+                if isdir(join(config['log_dir'], f))]
+    except OSError as err:
+        if err.errno != 2: # no such file or directory
+            raise err
+    return []
+
+def log_files(config, intf):
+    path = join(config['log_dir'], intf)
+    try:
+        return [join(path, f) for f in os.listdir(path) 
+                if isfile(join(path, f))]
+    except OSError as err:
+        if err.errno != 2: # no such file or directory
+            raise err
+    return[]
+
+def main(server, cmd=None, params=None):
+    # pylint: disable=W0613
+    
+    try:
+        req_format = 'json'
+        if 'format' in params:
+            req_format = params['format']
+        elif len(params) == 3:
+            req_format = params[-1]
+
+        config = load_config()
+
+        ports_match = re.match('^ibm ports$', cmd.strip())
+        file_match = re.match(r'^ibm (Ethernet[\d]+\/?[1-4]*) '
+                              r'files (\d[\d,]*$)', 
+                              cmd.strip())
+        info_match = re.match(r'^ibm (Ethernet[\d]+\/?[1-4]*) info$', 
+                              cmd.strip())
+
+        if ports_match:
+            return sorted(ports(config))
+        elif file_match:
+
+            if req_format not in ['csv', 'json', 'text']:
+                raise Exception('Unrecognized request format: %s' % 
+                                req_format)
+
+            files = [x.strip() 
+                     for x in file_match.groups()[1].split(',') 
+                     if x]
+            result = {}
+            for fname in files:
+                path = join(config['log_dir'],
+                            file_match.groups()[0],
+                            fname)
+
+                if req_format in ['csv', 'text']:
+                    if isfile(path):
+                        result[fname] = open(path).read()
+                    else:
+                        result[fname] = ''
+                elif req_format == 'json':
+                    if isfile(path):
+                        contents = [x for x in open(path).read().split('\n')
+                                    if x]
+                        if not contents:
+                            result[fname] = {}                            
+                        else:
+                            file_result = {}
+                            headers = [x.split('(')[0] for x in 
+                                       contents[0].split(',')]
+                            for line in contents[1:]:
+                                line = line.split(',')
+                                line_result = {}
+                                for index in range(len(headers) - 1):
+                                    index += 1
+                                    try:
+                                        line_result[headers[index]] = \
+                                            line[index]
+                                    except:
+                                        print index
+                                        print headers
+                                        print line_result
+                                        print line
+                                        raise
+                                file_result[line[0]] = line_result
+                            result[fname] = file_result
+                    else:
+                        result[fname] = {}
+
+            return result
+
+        elif info_match:
+            result = {}
+            for fname in log_files(config, info_match.groups()[0]):
+                contents = [x for x in open(fname).read().split('\n') 
+                            if x][1:]
+                first_line = contents[0].split(',')
+                last_line = contents[-1].split(',')
+                result[fname.split('/')[-1]] = {
+                    'path' : fname,
+                    'entries' : int(last_line[0]),
+                    'free' : config['log_entries'] - int(last_line[0]),
+                    'start' : int(first_line[3]),
+                    'end' : int(last_line[3]) + int((float(last_line[4]) * 
+                                                     1000))
+                    }
+            return result
+        else:
+            raise Exception('Unrecognized ibm command: %s' % cmd)
+        
+    except Exception as exc:      # pylint: disable=W0703
+        return {'error': str(exc),
+                'trace': traceback.format_exc()}
