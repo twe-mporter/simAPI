@@ -138,7 +138,7 @@ Adding a new plugin does NOT require restarting any services.
 
 This extension is only compatible with EOS-4.14.5F and later.
 
-## *ibm* branch
+## **ibm** branch
 The *ibm* branch of this repository defaults the simAPI configuration to enabling the Burst Monitor plugin in simApi.json:
 
 ```
