@@ -106,7 +106,7 @@ def main(server, cmd=None, params=None):
                             result[fname] = {}                            
                         else:
                             file_result = {}
-                            headers = [x.split('(')[0] for x in 
+                            headers = [x.strip() for x in 
                                        contents[0].split(',')]
                             for line in contents[1:]:
                                 line = line.split(',')
