@@ -188,12 +188,30 @@ class SimApiApplication(object):
                     request,
                     self.aaa_manager) as request:
                 request = cjson.decode(request.getRequestContent())
-                assert request['method'] == 'runCmds', \
-                    'Only runCmds is mocked'
+
+                params = request['params']
                 result = []
 
+                if request['method'] == 'getCommandCompletions':
+                    if isinstance(params, list):
+                        command = params[0]
+                    else:
+                        command = params['command']
+                        if isinstance(command, list):
+                            command = command[0]
+
+                    output = self.server.getCommandCompletions(
+                        command)
+
+                    result = cjson.encode({'jsonrpc': '2.0',
+                                           'result': output,
+                                           'id': request['id']})
+                    return ('200 OK', 'application/json', None, result)
+                elif request['method'] != 'runCmds':
+                    assert False, \
+                        'Only runCmds and getCommandCompletions are mocked'
+
                 req_format = 'json'
-                params = request['params']
                 if isinstance(params, list):
                     cmds = params[1]
                     if len(params) == 3:
@@ -227,7 +245,7 @@ class SimApiApplication(object):
                                         'id': request['id']})
                 return ('200 OK', 'application/json', None, result)
         except CapiRequestContext.HttpException as exc:
-            return ('%s %s' % (exc.code, exc.name), exc.content_type,
+            return ('%s %s' % (exc.code, exc.name), exc.contentType,
                     exc.additionalHeaders,
                     exc.message)
         except (Exception, cjson.DecodeError) as exc:
