@@ -11,4 +11,8 @@
 # 1.2.2 (May 2015)
 
 * Bug fix release
-	
+
+# 1.2.3 (May 2015)
+
+* Bug fix release - eAPI Explorer autocompletion support
+
