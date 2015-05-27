@@ -40,7 +40,7 @@ from os.path import isdir, isfile, join
 
 def ports(config):
     try:
-        return [f for f in os.listdir(config['log_dir']) 
+        return [f for f in os.listdir(config['log_dir'])
                 if isdir(join(config['log_dir'], f))]
     except OSError as err:
         if err.errno != 2: # no such file or directory
@@ -50,7 +50,7 @@ def ports(config):
 def log_files(config, intf):
     path = join(config['log_dir'], intf)
     try:
-        return [join(path, f) for f in os.listdir(path) 
+        return [join(path, f) for f in os.listdir(path)
                 if isfile(join(path, f))]
     except OSError as err:
         if err.errno != 2: # no such file or directory
@@ -59,7 +59,7 @@ def log_files(config, intf):
 
 def main(server, cmd=None, params=None):
     # pylint: disable=W0613
-    
+
     try:
         req_format = 'json'
         if 'format' in params:
@@ -71,9 +71,9 @@ def main(server, cmd=None, params=None):
 
         ports_match = re.match('^ibm ports$', cmd.strip())
         file_match = re.match(r'^ibm (Ethernet[\d]+\/?[1-4]*) '
-                              r'files (\d[\d,]*$)', 
+                              r'files (\d[\d,]*$)',
                               cmd.strip())
-        info_match = re.match(r'^ibm (Ethernet[\d]+\/?[1-4]*) info$', 
+        info_match = re.match(r'^ibm (Ethernet[\d]+\/?[1-4]*) info$',
                               cmd.strip())
 
         if ports_match:
@@ -81,18 +81,13 @@ def main(server, cmd=None, params=None):
         elif file_match:
 
             if req_format not in ['csv', 'json', 'text']:
-                raise Exception('Unrecognized request format: %s' % 
+                raise Exception('Unrecognized request format: %s' %
                                 req_format)
 
-            files = [x.strip() 
-                     for x in file_match.groups()[1].split(',') 
-                     if x]
-            result = {}
+            files = [x.strip() for x in file_match.groups()[1].split(',') if x]
+            result = []
             for fname in files:
-                path = join(config['log_dir'],
-                            file_match.groups()[0],
-                            fname)
-
+                path = join(config['log_dir'], file_match.groups()[0], fname)
                 if req_format in ['csv', 'text']:
                     if isfile(path):
                         result[fname] = open(path).read()
@@ -100,63 +95,62 @@ def main(server, cmd=None, params=None):
                         result[fname] = ''
                 elif req_format == 'json':
                     if isfile(path):
-                        contents = [x for x in open(path).read().split('\n')
+                        contents = [x for x in open(path).read().split('\n') 
                                     if x]
                         if not contents:
-                            result[fname] = {}                            
+                            result.append({})
                         else:
-                            file_result = {}
-                            headers = [x.strip() for x in 
-                                       contents[0].split(',')]
+                            first_line = contents[1].split(',')
+                            last_line = contents[-1].split(',')
+                            start = float(first_line[3])
+                            end = float(last_line[3])
+                            file_info = {'name': fname, 
+                                         'first_timestamp_ms': start, 
+                                         'last_timestamp_ms': end, 
+                                         'entries': []}
+                            headers = [x.strip() 
+                                       for x in contents[0].split(',')]
                             for line in contents[1:]:
                                 line = line.split(',')
                                 line_result = {}
                                 for index in range(len(headers) - 1):
+                                    line_result[headers[index]] = line[index]
                                     index += 1
-                                    try:
-                                        line_result[headers[index]] = \
-                                            line[index]
-                                    except:
-                                        print index
-                                        print headers
-                                        print line_result
-                                        print line
-                                        raise
-                                file_result[line[0]] = line_result
-                            result[fname] = file_result
+                                file_info['entries'].append(line_result)
+                            result.append(file_info)
                     else:
-                        result[fname] = {}
+                        result.append({})
 
             return result
 
         elif info_match:
-            result = {}
+            result = []
             for fname in log_files(config, info_match.groups()[0]):
-                contents = [x for x in open(fname).read().split('\n') 
-                            if x][1:]
+                contents = [x for x in open(fname).read().split('\n') if x][1:]
                 if contents:
                     first_line = contents[0].split(',')
                     last_line = contents[-1].split(',')
                     entries = int(last_line[0])
-                    start = int(first_line[3])
-                    end = int(last_line[3]) + int((float(last_line[4]) * 
-                                                   1000))
+                    start = float(first_line[3])
+                    end = float(last_line[3]) + float(last_line[4])
                 else:
                     entries = 0
                     start = 'N/A'
                     end = 'N/A'
-
-                result[fname.split('/')[-1]] = {
+                
+                file_info = {
+                    'name' : fname.split('/')[-1],
                     'path' : fname,
                     'entries' : entries,
                     'free' : config['log_entries'] - entries,
-                    'start' : start,
-                    'end' : end
-                    }           
+                    'start_ms' : start,
+                    'end_ms' : end
+                    }
+                result.append(file_info)
             return result
         else:
             raise Exception('Unrecognized ibm command: %s' % cmd)
-        
+
     except Exception as exc:      # pylint: disable=W0703
         return {'error': str(exc),
                 'trace': traceback.format_exc()}
