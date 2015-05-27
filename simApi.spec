@@ -35,6 +35,7 @@ sudo /usr/bin/immortalize --daemonize /usr/bin/uwsgi --ini /etc/uwsgi/simApi.ini
 
 %postun
 sudo service nginx restart
+rm -rf /persist/sys/simAPI
 
 %files
 %defattr(-,root,eosadmin,-)
