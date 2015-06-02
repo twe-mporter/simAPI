@@ -90,9 +90,11 @@ def main(server, cmd=None, params=None):
                 path = join(config['log_dir'], file_match.groups()[0], fname)
                 if req_format in ['csv', 'text']:
                     if isfile(path):
-                        result[fname] = open(path).read()
+                        result.append({'name' : fname,
+                                       'contents' : open(path).read()})
                     else:
-                        result[fname] = ''
+                        result.append({'name' : fname,
+                                       'contents' : ''})
                 elif req_format == 'json':
                     if isfile(path):
                         contents = [x for x in open(path).read().split('\n') 
