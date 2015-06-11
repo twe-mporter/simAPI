@@ -40,7 +40,7 @@ rm -rf /persist/sys/simAPI
 %files
 %defattr(-,root,eosadmin,-)
 %{python_sitelib}/SimApi.pyc
-%{python_sitelib}/simApi-%{version}-py2.7.egg-info/*
+%{python_sitelib}/simApi*.egg-info
 %{_sysconfdir}/nginx/external_conf/simApi.conf
 %{_sysconfdir}/uwsgi/simApi.ini
 %config(noreplace) /persist/sys/simAPI/simApi.json
@@ -49,3 +49,4 @@ rm -rf /persist/sys/simAPI
 %config /persist/sys/simAPI/plugins/ibm
 %exclude %{python_sitelib}/SimApi.py
 %exclude %{python_sitelib}/SimApi.pyo
+
