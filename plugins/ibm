@@ -119,7 +119,7 @@ def main(server, cmd=None, params=None):
                             for line in contents[1:]:
                                 line = line.split(',')
                                 line_result = {}
-                                for index in range(len(headers) - 1):
+                                for index in range(len(headers)):
                                     line_result[headers[index]] = line[index]
                                     index += 1
                                 file_info['entries'].append(line_result)
