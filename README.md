@@ -118,13 +118,16 @@ And here is how the results look in Python (example):
 
 ## Plugins
 
-Plugins must be written in Python and added to **/persist/sys/simAPI/plugins**. They must have a **main** method, which has a single input argument called *server*. This attribute is a jsonrpc.Server object which can be used in order to access the underlying eAPI engine on the switch.
+Plugins must be written in Python and added to **/persist/sys/simAPI/plugins**. They must have a **main** method, which has the following attributes:
+ - *server*: a jsonrpc.Server object which can be used in order to access the underlying eAPI engine on the switch
+ - *cmd*: the eAPI command
+ - *params*: the eAPI parameters (the format of the request will be one of them)
 
 Here is an example:
 
 ```
 # force eAPI to always return the 'text' output for 'show version'
-def main(server):
+def main(server, cmd, params):
     return server.runCmds(1, ['show version'], 'text')[0]
 ```
 
