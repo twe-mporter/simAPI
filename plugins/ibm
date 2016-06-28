@@ -35,12 +35,12 @@ import os
 import re
 import traceback
 
-from ibm_lib import load_config   # pylint: disable=F0401
+from burstmonitor_lib import load_config   # pylint: disable=F0401
 from os.path import isdir, isfile, join
 
 def ports(config):
     try:
-        return [f.replace('_', '/') 
+        return [f.replace('_', '/')
                 for f in os.listdir(config['log_dir'])
                 if isdir(join(config['log_dir'], f))]
     except OSError as err:
@@ -49,7 +49,7 @@ def ports(config):
     return []
 
 def log_files(config, intf):
-    path = join(config['log_dir'], 
+    path = join(config['log_dir'],
                 intf.replace('/', '_'))
     try:
         return [join(path, f) for f in os.listdir(path)
@@ -89,8 +89,8 @@ def main(server, cmd=None, params=None):
             files = [x.strip() for x in file_match.groups()[1].split(',') if x]
             result = []
             for fname in files:
-                path = join(config['log_dir'], 
-                            file_match.groups()[0].replace('/', '_'), 
+                path = join(config['log_dir'],
+                            file_match.groups()[0].replace('/', '_'),
                             fname)
                 if req_format in ['csv', 'text']:
                     if isfile(path):
@@ -101,7 +101,7 @@ def main(server, cmd=None, params=None):
                                        'contents' : ''})
                 elif req_format == 'json':
                     if isfile(path):
-                        contents = [x for x in open(path).read().split('\n') 
+                        contents = [x for x in open(path).read().split('\n')
                                     if x]
                         if not contents:
                             result.append({})
@@ -110,11 +110,11 @@ def main(server, cmd=None, params=None):
                             last_line = contents[-1].split(',')
                             start = float(first_line[3])
                             end = float(last_line[3])
-                            file_info = {'name': fname, 
-                                         'first_timestamp_ms': start, 
-                                         'last_timestamp_ms': end, 
+                            file_info = {'name': fname,
+                                         'first_timestamp_ms': start,
+                                         'last_timestamp_ms': end,
                                          'entries': []}
-                            headers = [x.strip() 
+                            headers = [x.strip()
                                        for x in contents[0].split(',')]
                             for line in contents[1:]:
                                 line = line.split(',')
@@ -131,7 +131,7 @@ def main(server, cmd=None, params=None):
 
         elif info_match:
             result = []
-            for fname in log_files(config, 
+            for fname in log_files(config,
                                    info_match.groups()[0]):
                 contents = [x for x in open(fname).read().split('\n') if x][1:]
                 if contents:
@@ -144,7 +144,7 @@ def main(server, cmd=None, params=None):
                     entries = 0
                     start = 'N/A'
                     end = 'N/A'
-                
+
                 file_info = {
                     'name' : fname.split('/')[-1],
                     'path' : fname,
