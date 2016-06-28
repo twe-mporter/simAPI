@@ -35,7 +35,11 @@ import os
 import re
 import traceback
 
-from burstmonitor_lib import load_config   # pylint: disable=F0401
+try:
+    from burstmonitor_lib import load_config   # pylint: disable=F0401
+except:
+    from ibm_lib import load_config   # pylint: disable=F0401
+
 from os.path import isdir, isfile, join
 
 def ports(config):
