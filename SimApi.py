@@ -82,7 +82,7 @@ def load_config():
 
 class SimApiApplication(object):
     def __init__(self):
-        self.aaa_manager = CapiAaa.AaaManager('ar')
+        self.aaa_manager = CapiAaa.CapiAaaManager('ar')
         self.server = jsonrpclib.Server(EAPI_SOCKET)
 
     def __call__(self, request, start_response):
