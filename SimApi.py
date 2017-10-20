@@ -40,9 +40,14 @@ import traceback
 
 import jsonrpclib
 
-import CapiAaa
 import CapiConstants
 import CapiRequestContext
+
+#Handle non-backward compatible CAPI change
+try:
+    from CapiAaa import CapiAaaManager as AaaManager
+except ImportError:
+    from CapiAaa import AaaManager
 
 EAPI_SOCKET = 'unix:/var/run/command-api.sock'
 
@@ -82,7 +87,8 @@ def load_config():
 
 class SimApiApplication(object):
     def __init__(self):
-        self.aaa_manager = CapiAaa.CapiAaaManager('ar')
+
+        self.aaa_manager = AaaManager('ar')
         self.server = jsonrpclib.Server(EAPI_SOCKET)
 
     def __call__(self, request, start_response):

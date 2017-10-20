@@ -16,3 +16,6 @@
 
 * Bug fix release - eAPI Explorer autocompletion support
 
+# 1.2.4 (Oct 2017)
+
+* Bug fix release - update to reflect CAPI changes
