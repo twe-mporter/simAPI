@@ -47,7 +47,8 @@ import UwsgiRequestContext
 try:
     from CapiAaa import CapiAaaManager as AaaManager
 except ImportError:
-    from CapiAaa import AaaManager
+    from UwsgiAaa import UwsgiAaaManager as AaaManager
+
 
 EAPI_SOCKET = 'unix:/var/run/command-api.sock'
 
@@ -190,66 +191,68 @@ class SimApiApplication(object):
         try:
             config = load_config()
 
-            with UwsgiRequestContext.UwsgiRequestContext(
-                    request,
-                    self.aaa_manager) as request:
-                request = cjson.decode(request.getRequestContent())
+            request = UwsgiRequestContext.UwsgiRequestContext(
+                request,
+                self.aaa_manager)
 
-                params = request['params']
-                result = []
+            request = cjson.decode(request.getRequestContent())
 
-                if request['method'] == 'getCommandCompletions':
-                    if isinstance(params, list):
-                        command = params[0]
-                    else:
-                        command = params['command']
-                        if isinstance(command, list):
-                            command = command[0]
+            params = request['params']
+            result = []
 
-                    output = self.server.getCommandCompletions(
-                        command)
-
-                    result = cjson.encode({'jsonrpc': '2.0',
-                                           'result': output,
-                                           'id': request['id']})
-                    return ('200 OK', 'application/json', None, result)
-                elif request['method'] != 'runCmds':
-                    assert False, \
-                        'Only runCmds and getCommandCompletions are mocked'
-
-                req_format = 'json'
+            if request['method'] == 'getCommandCompletions':
                 if isinstance(params, list):
-                    cmds = params[1]
-                    if len(params) == 3:
-                        req_format = params[2]
+                    command = params[0]
                 else:
-                    cmds = params['cmds']
-                    if 'format' in params:
-                        req_format = params['format']
-                    elif len(params) == 3:
-                        req_format = params[-1]
+                    command = params['command']
+                    if isinstance(command, list):
+                        command = command[0]
 
-                for index, cmd in enumerate(cmds):
-                    cmd_result = self.processCommand(cmd, config, params)
-                    if cmd_result is not None:
-                        result.append(cmd_result)
-                    else:
-                        try:
-                            output = self.server.runCmds(
-                                1, cmds[:index+1], req_format)[-1]
-                            result.append(output)
-                        except jsonrpclib.ProtocolError as exc:
-                            result = cjson.encode({
-                                    'jsonrpc': '2.0',
-                                    'error': {'code': exc.message[0],
-                                              'message': exc.message[1]},
-                                    'id': request['id']})
-                            return ('1002 invalid command', 'application/json',
-                                    None, result)
+                output = self.server.getCommandCompletions(
+                    command)
+
                 result = cjson.encode({'jsonrpc': '2.0',
-                                        'result': result,
-                                        'id': request['id']})
+                                       'result': output,
+                                       'id': request['id']})
                 return ('200 OK', 'application/json', None, result)
+            elif request['method'] != 'runCmds':
+                assert False, \
+                    'Only runCmds and getCommandCompletions are mocked'
+
+            req_format = 'json'
+            if isinstance(params, list):
+                cmds = params[1]
+                if len(params) == 3:
+                    req_format = params[2]
+            else:
+                cmds = params['cmds']
+                if 'format' in params:
+                    req_format = params['format']
+                elif len(params) == 3:
+                    req_format = params[-1]
+
+            for index, cmd in enumerate(cmds):
+                cmd_result = self.processCommand(cmd, config, params)
+                if cmd_result is not None:
+                    result.append(cmd_result)
+                else:
+                    try:
+                        output = self.server.runCmds(
+                            1, cmds[:index+1], req_format)[-1]
+                        result.append(output)
+                    except jsonrpclib.ProtocolError as exc:
+                        result = cjson.encode({
+                                'jsonrpc': '2.0',
+                                'error': {'code': exc.message[0],
+                                          'message': exc.message[1]},
+                                'id': request['id']})
+                        return ('1002 invalid command', 'application/json',
+                                None, result)
+            result = cjson.encode({'jsonrpc': '2.0',
+                                    'result': result,
+                                    'id': request['id']})
+            return ('200 OK', 'application/json', None, result)
+
         except UwsgiRequestContext.HttpException as exc:
             return ('%s %s' % (exc.code, exc.name), exc.contentType,
                     exc.additionalHeaders,
