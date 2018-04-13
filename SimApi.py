@@ -40,8 +40,8 @@ import traceback
 
 import jsonrpclib
 
-import CapiConstants
-import CapiRequestContext
+import UwsgiConstants
+import UwsgiRequestContext
 
 #Handle non-backward compatible CAPI change
 try:
@@ -99,7 +99,7 @@ class SimApiApplication(object):
         if body:
             headers.append(('Content-length', str(len(body))))
             start_response(code,
-                           CapiConstants.ServerConstants.DEFAULT_HEADERS +
+                           UwsgiConstants.DEFAULT_HEADERS +
                            headers)
         return [body]
 
@@ -190,7 +190,7 @@ class SimApiApplication(object):
         try:
             config = load_config()
 
-            with CapiRequestContext.RequestContext(
+            with UwsgiRequestContext.UwsgiRequestContext(
                     request,
                     self.aaa_manager) as request:
                 request = cjson.decode(request.getRequestContent())
@@ -250,7 +250,7 @@ class SimApiApplication(object):
                                         'result': result,
                                         'id': request['id']})
                 return ('200 OK', 'application/json', None, result)
-        except CapiRequestContext.HttpException as exc:
+        except UwsgiRequestContext.HttpException as exc:
             return ('%s %s' % (exc.code, exc.name), exc.contentType,
                     exc.additionalHeaders,
                     exc.message)
