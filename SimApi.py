@@ -40,14 +40,18 @@ import traceback
 
 import jsonrpclib
 
-import UwsgiConstants
-import UwsgiRequestContext
 
 #Handle non-backward compatible CAPI change
 try:
+    from CapiConstants import ServerConstants
     from CapiAaa import CapiAaaManager as AaaManager
+    from CapiRequestContext import RequestContext, HttpException 
 except ImportError:
     from UwsgiAaa import UwsgiAaaManager as AaaManager
+    import UwsgiConstants as ServerConstants
+    from UwsgiRequestContext import HttpException, UwsgiRequestContext \
+        as RequestContext
+    
 
 
 EAPI_SOCKET = 'unix:/var/run/command-api.sock'
@@ -100,7 +104,7 @@ class SimApiApplication(object):
         if body:
             headers.append(('Content-length', str(len(body))))
             start_response(code,
-                           UwsgiConstants.DEFAULT_HEADERS +
+                           ServerConstants.DEFAULT_HEADERS +
                            headers)
         return [body]
 
@@ -191,7 +195,7 @@ class SimApiApplication(object):
         try:
             config = load_config()
 
-            request = UwsgiRequestContext.UwsgiRequestContext(
+            request = RequestContext(
                 request,
                 self.aaa_manager)
 
@@ -253,7 +257,7 @@ class SimApiApplication(object):
                                     'id': request['id']})
             return ('200 OK', 'application/json', None, result)
 
-        except UwsgiRequestContext.HttpException as exc:
+        except HttpException as exc:
             return ('%s %s' % (exc.code, exc.name), exc.contentType,
                     exc.additionalHeaders,
                     exc.message)
