@@ -44,13 +44,17 @@ import jsonrpclib
 #Handle non-backward compatible CAPI change
 try:
     from CapiConstants import ServerConstants
-    from CapiAaa import CapiAaaManager as AaaManager
     from CapiRequestContext import RequestContext, HttpException 
 except ImportError:
-    from UwsgiAaa import UwsgiAaaManager as AaaManager
     import UwsgiConstants as ServerConstants
-    from UwsgiRequestContext import HttpException, UwsgiRequestContext \
+    from UwsgiRequestContext import HttpException, UwsgiRequestContext\
         as RequestContext
+
+
+try:
+    from CapiAaa import CapiAaaManager as AaaManager
+except ImportError:
+    from UwsgiAaa import UwsgiAaaManager as AaaManager
     
 
 
